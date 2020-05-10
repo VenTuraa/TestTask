@@ -14,15 +14,16 @@ public class GameController : MonoBehaviour
 
 	void Awake()
 	{
-		if (GetInstance ==null)
+		if (GetInstance == null)
 			GetInstance = this;
 	}
 
 	void Start()
-	{btnRestart.onClick.AddListener(() =>
-		{
-			Restart();
-		});
+	{
+		btnRestart.onClick.AddListener(() =>
+		   {
+			   Restart();
+		   });
 		StartCoroutine(Countdown());
 	}
 
@@ -43,6 +44,7 @@ public class GameController : MonoBehaviour
 
 	public void Restart()
 	{
+		Time.timeScale = 1;
 		SceneManager.LoadScene(0);
 	}
 }

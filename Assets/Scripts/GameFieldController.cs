@@ -7,7 +7,7 @@ public class GameFieldController : MonoBehaviour
 	private float speed = 2.5f;
 	private int endPoint = -55;
 
-
+	[HideInInspector]
 	public List<Vector3> listDirections = new List<Vector3>()
 	{
 		new Vector3(0,0,1),     //left
@@ -17,14 +17,21 @@ public class GameFieldController : MonoBehaviour
 	};
 
 	public static GameFieldController GetInstance { get; private set; }
-	private static int _levelLength = 61;
-	Cube[,] listCubes = new Cube[_levelLength, 5];
-	public GameObject defaultCube;
-	public Material 
+
+	private static int _levelLength = 61;  //Length of field
+
+	Cube[,] listCubes = new Cube[_levelLength, 5];  // all cubes
+
+	public GameObject defaultCube;                  // cube prefab
+
+	[Range(0, 100)]
+	public int _complexity = 85; // complexity
+
+	public Material   // cube materials
 		matDefault,
 		matUpperCube;
 
-	private Vector3 startPosition;
+	private Vector3 startPosition; //start position of field
 
 	System.Random rnd = new System.Random();
 	private void Awake()
@@ -42,21 +49,20 @@ public class GameFieldController : MonoBehaviour
 	private void Start()
 	{
 		startPosition = transform.position;
-		setCubes();
+		setupCubes();
 	}
 
-	public void setCubes()
+	public void setupCubes()
 	{
 		for (int i = 0; i < _levelLength; i++)
 		{
 			for (int j = 0; j < 5; j++)
 			{
-				//if (i > 5 && (j == 1 || j == 2) && i < _levelLength - 3)
 				if (i > 5 && i < _levelLength - 3)
 				{
 					int random = rnd.Next(0, 100);
 
-					if (random > 80 && !listCubes[i, j].covered && !listCubes[i, j].upper)
+					if (random > _complexity && !listCubes[i, j].covered && !listCubes[i, j].upper)
 					{
 						int rndDirection = 0;
 						while (!listCubes[i, j].upper)
@@ -69,7 +75,7 @@ public class GameFieldController : MonoBehaviour
 										if (j != 4)
 										{
 											if (listCubes[i, j].transform.position + listDirections[rndDirection] ==
-												listCubes[i, j + 1].transform.position)
+												listCubes[i, j + 1].transform.position && !listCubes[i, j + 1].covered)
 											{
 												listCubes[i, j].upper = true;
 												listCubes[i, j + 1].covered = true;
@@ -82,7 +88,7 @@ public class GameFieldController : MonoBehaviour
 										if (j != 0)
 										{
 											if (listCubes[i, j].transform.position + listDirections[rndDirection] ==
-												listCubes[i, j - 1].transform.position)
+												listCubes[i, j - 1].transform.position && !listCubes[i, j - 1].covered)
 											{
 												listCubes[i, j].upper = true;
 												listCubes[i, j - 1].covered = true;
@@ -128,6 +134,8 @@ public class GameFieldController : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 		}
 		GameController.GetInstance.btnRestart.gameObject.SetActive(true);
+		GameController.GetInstance.txtCountDownTime.gameObject.SetActive(true);
+		GameController.GetInstance.txtCountDownTime.text = "COMPLETE!";
 		yield return 0;
 	}
 
@@ -143,7 +151,7 @@ public class GameFieldController : MonoBehaviour
 				listCubes[i, j].transform.position = new Vector3(i, 0, j);
 			}
 		}
-		setCubes();
+		setupCubes();
 		transform.position = startPosition;
 	}
 }
